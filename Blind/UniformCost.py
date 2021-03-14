@@ -32,7 +32,7 @@ class Graph:
                 small = costofPath
             print(self.pathList)
             print("Visited Nodes = ", self.visitedNodes)
-            if(len(self.visitedNodes) == numberOfNodes-1):
+            if(self.isOpenNodeAccessible()):
                 break
         print("Smallest Path = ", self.pathList[small])
 
@@ -78,6 +78,12 @@ class Graph:
     def addToVisitedNodes(self, node):
         if(node not in self.visitedNodes):
             self.visitedNodes.append(node)
+
+    def isOpenNodeAccessible(self):
+        for x in self.openNodes:
+            if x in self.graph[self.rootNode]:
+                return True
+        return False
 
 
 g = Graph()
