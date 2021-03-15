@@ -1,4 +1,4 @@
-# Uniform Cost Search in Weighted Directed Graph
+# A Star Search in Weighted Directed Graph
 from collections import defaultdict
 
 
