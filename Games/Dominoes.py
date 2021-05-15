@@ -23,12 +23,15 @@ class GameTree:
 
     def makeTree(self):
         queue = []
+        minDepth = 999
+        currentDepth = 0
         self.makeNextStates(
-            self.rootState, self.currentDominoes, self.otherDominoes, queue)
+            self.rootState, self.currentDominoes, self.otherDominoes, queue, minDepth, currentDepth)
 
         if(len(queue) > 2):
             queue.pop(-1)
         queue.pop(0)
+        print("Queue:", queue)
         return queue
 
     def findAllPlayableDominoes(self, currentState, dominoes):
@@ -54,14 +57,19 @@ class GameTree:
         elif(reverseDomino in dominoSet):
             dominoSet.remove(reverseDomino)
 
-    def makeNextStates(self, currentState, currentDominoes, otherDominoes, queue):
+    def makeNextStates(self, currentState, currentDominoes, otherDominoes, queue, minDepth, currentDepth):
         if(len(otherDominoes) == 0):
             queue.extend([currentState.moveRequired, 1])
+            minDepth = currentDepth
             return
         elif(len(currentDominoes) == 0):
             queue.extend([currentState.moveRequired, 0])
+            minDepth = currentDepth
+            return
+        elif(minDepth < currentDepth):
             return
         else:
+            currentDepth += 1
             playableDominoes = self.findAllPlayableDominoes(
                 currentState.currentState, currentDominoes)
             for domino in playableDominoes:
@@ -69,7 +77,7 @@ class GameTree:
             queue.append(currentState.moveRequired)
             for state in currentState.nextStates:
                 self.makeNextStates(state, currentDominoes,
-                                    otherDominoes, queue)
+                                    otherDominoes, queue, minDepth, currentDepth)
                 if(queue[-1] == 1 or queue[-1] == 0):
                     break
 
@@ -147,17 +155,6 @@ class Player:
         bestDomino = self.returnBestPlayableDomino(playableDominoes)
         return bestDomino
 
-    def chooseAMove(self, moveAI, moveAlgorithm):
-        if(moveAI == moveAlgorithm):
-            return moveAI
-        else:
-            if(moveAI[0] < 0):
-                return moveAlgorithm
-            elif(moveAlgorithm[0] < 0):
-                return moveAI
-            else:
-                return moveAI
-
     def makeMove(self, currentState, otherDominoes):
         print(f"\n\n{self.playername} moves now")
         nextMove = (-1, 0)
@@ -169,9 +166,7 @@ class Player:
         if(len(self.moveList) > 0):
             nextMove = self.moveList.pop(0)
         print("AI Suggests:", nextMove)
-
-        bestDomino = self.findBestDomino(
-            currentState[0][0], currentState[-1][1])
+        self.removeDomino(nextMove)
         return nextMove
 
     def returnNoOfDominoesLeft(self):
